@@ -16,7 +16,6 @@ import java.io.IOException
 
 class MainActivity : AppCompatActivity() {
 
-    // 🔑 Paste your Gemini API key here
     private val API_KEY = BuildConfig.GEMINI_API_KEY
     private val client = OkHttpClient()
 
