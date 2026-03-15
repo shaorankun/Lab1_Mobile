@@ -17,7 +17,7 @@ import java.io.IOException
 class MainActivity : AppCompatActivity() {
 
     // 🔑 Paste your Gemini API key here
-    private val API_KEY = "AIzaSyDUNaSDVhcQeYFBxRshQl9y9aV7trlQWwg"
+    private val API_KEY = BuildConfig.GEMINI_API_KEY
     private val client = OkHttpClient()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
         emojiText: TextView,
         rootLayout: LinearLayout
     ) {
-        val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=$API_KEY"
+        val url = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$API_KEY"
 
         val prompt = """
             Analyze the sentiment of this sentence: "$sentence"
@@ -84,6 +84,9 @@ class MainActivity : AppCompatActivity() {
 
             override fun onResponse(call: Call, response: Response) {
                 val responseBody = response.body?.string() ?: return
+
+                android.util.Log.d("SENTIMENT", "Response: $responseBody")
+
                 try {
                     val result = JSONObject(responseBody)
                     val text = result
@@ -117,4 +120,52 @@ class MainActivity : AppCompatActivity() {
             }
         })
     }
+
+// For manual check
+//    private fun analyzeSentiment(
+//        sentence: String,
+//        emojiText: TextView,
+//        rootLayout: LinearLayout
+//    ) {
+//        val positiveWords = setOf(
+//            "good", "great", "love", "like", "awesome", "happy", "excellent",
+//            "wonderful", "fantastic", "nice", "best", "fun", "enjoy", "glad",
+//            "superb", "amazing", "brilliant", "let's", "yes", "sure", "please",
+//            "yay", "excited", "delicious", "perfect", "beautiful", "cool"
+//        )
+//
+//        val negativeWords = setOf(
+//            "bad", "hate", "dislike", "awful", "terrible", "sad", "worst",
+//            "horrible", "no", "not", "never", "boring", "ugly", "poor",
+//            "disgusting", "gross", "annoying", "wrong", "unfortunately",
+//            "don't", "won't", "can't", "ugh", "nope", "thanks no", "no thanks"
+//        )
+//
+//        val words = sentence.lowercase()
+//            .replace("'", "'")  // normalize apostrophes
+//            .split(" ", ",", ".", "!", "?")
+//            .filter { it.isNotEmpty() }
+//
+//        // Also check two-word combos like "no thanks", "don't like"
+//        val bigrams = (0 until words.size - 1).map { "${words[it]} ${words[it+1]}" }
+//
+//        var score = 0
+//        for (word in words) {
+//            if (positiveWords.contains(word)) score++
+//            if (negativeWords.contains(word)) score--
+//        }
+//        for (bigram in bigrams) {
+//            if (negativeWords.contains(bigram)) score -= 2  // stronger penalty
+//        }
+//
+//        runOnUiThread {
+//            if (score >= 0) {
+//                rootLayout.setBackgroundColor(Color.parseColor("#4CAF50"))
+//                emojiText.text = "😊"
+//            } else {
+//                rootLayout.setBackgroundColor(Color.parseColor("#8B0000"))
+//                emojiText.text = "☹️"
+//            }
+//        }
+//    }
 }
